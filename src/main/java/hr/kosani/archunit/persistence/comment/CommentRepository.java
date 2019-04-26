@@ -13,8 +13,8 @@ import java.util.List;
 @Repository
 public class CommentRepository implements ICommentRepository {
 
-    // TODO Remark: logger API should be preferred to logger implantation.
-    // TODO Remark: logger should be final, static and named with upper_case LOG.
+    // TODO Remark 5: Logger API should be preferred to logger implementation.
+    // TODO Remark 6: Logger should be final, static and named with upper_case LOG.
     private static Logger log = LogManager.getLogger(CommentRepository.class);
 
     private static final String SELECT_ALL_BY_POST_ID = "SELECT ID, USER_EMAIL, MESSAGE, POSTED_ON from COMMENT WHERE POST_ID = ?";
@@ -24,7 +24,6 @@ public class CommentRepository implements ICommentRepository {
     @Resource(name = "java:comp/jdbc/myJdbc")
     private DataSource dataSource;
 
-    // TODO Remark read methods should be called by find
     @Override
     public List<Comment> getAllByPostId(Long postId) throws SQLException {
         log.info("Fetching comments by post id {}", postId);

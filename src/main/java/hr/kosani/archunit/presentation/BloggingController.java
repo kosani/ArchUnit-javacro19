@@ -29,7 +29,7 @@ public class BloggingController {
         try {
             return service.findPostWithCommentsById(id);
         } catch (SQLException e) { // TODO Remark 2: persistence-specific exceptions shouldn't leak to presentation layer.
-            // TODO Remark ?: app shouldn't write to standard streams
+            // TODO Remark 7: App shouldn't write to standard streams.
             e.printStackTrace();
             return null;
         }
@@ -54,6 +54,7 @@ public class BloggingController {
             // TODO Remark 1: direct access to repositories, services are skipped.
             commentRepository.deleteById(commentId);
         } catch (SQLException e) { // TODO Remark 2: persistence-specific exceptions shouldn't leak to presentation layer.
+            // TODO Remark 7: App shouldn't write to standard streams.
             e.printStackTrace();
         }
     }

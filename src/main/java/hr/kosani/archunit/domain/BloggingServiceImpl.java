@@ -13,7 +13,7 @@ import java.sql.SQLException;
 public class BloggingServiceImpl implements BloggingService {
 
     private final PostRepository postRepository;
-    // Remark ?: Is not interface
+    // TODO Remark 3: Should depend on interface rather than implementation
     private final CommentRepository commentRepository;
 
     @Inject
