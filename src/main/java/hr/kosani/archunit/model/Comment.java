@@ -7,7 +7,7 @@ public class Comment {
     private Long postId;
     private String usersEMail;
     private String message;
-    // TODO prefer LocalDateTime to Date
+    // TODO Remark ? prefer LocalDateTime to Date
     private Date postedOn;
 
     public Long getId() {

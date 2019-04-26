@@ -1,20 +1,33 @@
 package hr.kosani.archunit;
 
-import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
-
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import org.junit.Test;
 import org.slf4j.Logger;
 
+import static com.tngtech.archunit.lang.conditions.ArchConditions.not;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+
 public class NamingConventionsTest {
 
     private final JavaClasses classes = new ClassFileImporter().importPackages("hr.kosani.archunit");
+
+    private ArchCondition<JavaClass> havePrefixI = new ArchCondition<JavaClass>("have prefix I") {
+        @Override
+        public void check(JavaClass item, ConditionEvents events) {
+            String className = item.getSimpleName();
+            boolean satisfied = className.length() > 2 && className.charAt(0) == 'I'
+                    && Character.isUpperCase(className.charAt(1));
+            String message = String.format("Interface %s %s prefixed with 'I'",
+                    item.getName(),
+                    satisfied ? "is" : "is not");
+            events.add(new SimpleConditionEvent(item, satisfied, message));
+        }
+    };
 
     @Test
     public void readMethodsInRepositoriesShouldStartWithFind() {
@@ -22,6 +35,7 @@ public class NamingConventionsTest {
                 .should().haveNameMatching("find.*")
                 .orShould().haveNameMatching("save.*")
                 .orShould().haveNameMatching("delete.*")
+                .as("repository methods names should only be start with find, save or delete*")
                 .check(classes);
     }
 
@@ -53,33 +67,14 @@ public class NamingConventionsTest {
                 .andShould().beStatic()
                 .andShould().beFinal()
                 .andShould().haveName("LOG")
-                .because("this is a convention")
+                .because("we agreed on this convention")
                 .check(classes);
     }
 
     @Test
-    public void interfacesShouldNotHaveCSharpPrefixI() {
-        classes().that().areInterfaces().should(notBePrefixedWithI()).check(classes);
-    }
-
-    private ArchCondition<? super JavaClass> notBePrefixedWithI() {
-        return new ArchCondition<JavaClass>("not have prefix I") {
-            @Override
-            public void check(JavaClass item, ConditionEvents events) {
-                DescribedPredicate<JavaClass> predicate = new DescribedPredicate<JavaClass>("has name starting with I") {
-                    @Override
-                    public boolean apply(JavaClass input) {
-                        String className = input.getSimpleName();
-                        return className.length() > 2 && className.charAt(0) == 'I'
-                                && Character.isUpperCase(className.charAt(1));
-                    }
-                };
-                boolean satisfied = predicate.apply(item);
-                String message = String.format("Interface %s %s prefixed with 'I'",
-                        item.getName(),
-                        satisfied ? "is" : "is not");
-                events.add(new SimpleConditionEvent(item, satisfied, message));
-            }
-        };
+    public void interfacesShouldNotHavePrefixI() {
+        classes().that().areInterfaces().should(not(havePrefixI))
+                .because("we have more sophisticated IDE-s that tell us when a class is an interface")
+                .check(classes);
     }
 }

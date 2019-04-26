@@ -1,16 +1,17 @@
-package hr.kosani.archunit.persistence;
+package hr.kosani.archunit.persistence.comment;
 
 import hr.kosani.archunit.Repository;
 import hr.kosani.archunit.model.Comment;
-import hr.kosani.archunit.persistence.mapper.PostMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Resource;
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 
 @Repository
-public class CommentRepository {
+public class CommentRepository implements ICommentRepository {
 
     // TODO Remark: logger API should be preferred to logger implantation.
     // TODO Remark: logger should be final, static and named with upper_case LOG.
@@ -20,21 +21,18 @@ public class CommentRepository {
     private static final String INSERT = "INSERT INTO COMMENT (POST_ID, USER_EMAIL, MESSAGE, POSTED_ON) VALUES ( ?, ?, ?, ? )";
     private static final String DELETE = "DELETE FROM COMMENT WHERE ID = ?";
 
-    // TODO prefer DI to singletons
-    private static CommentRepository instance = new CommentRepository();
+    @Resource(name = "java:comp/jdbc/myJdbc")
+    private DataSource dataSource;
 
-    public static CommentRepository getInstance() {
-        return instance;
-    }
-
-    // TODO read methods should be called by find
+    // TODO Remark read methods should be called by find
+    @Override
     public List<Comment> getAllByPostId(Long postId) throws SQLException {
         log.info("Fetching comments by post id {}", postId);
-        Connection connection = DatabaseConnection.getInstance().getConnection();
+        Connection connection = dataSource.getConnection();
         PreparedStatement statement = connection.prepareStatement(SELECT_ALL_BY_POST_ID);
         statement.setLong(1, postId);
         ResultSet resultSet = statement.executeQuery();
-        List<Comment> comments = PostMapper.toComments(resultSet);
+        List<Comment> comments = CommentMapper.toComments(resultSet);
 
         resultSet.close();
         statement.close();
@@ -42,9 +40,10 @@ public class CommentRepository {
         return comments;
     }
 
+    @Override
     public void deleteById(Long id) throws SQLException {
         log.info("Deleting comment of id {}", id);
-        Connection connection = DatabaseConnection.getInstance().getConnection();
+        Connection connection = dataSource.getConnection();
         PreparedStatement statement = connection.prepareStatement(DELETE);
         statement.setLong(1, id);
         statement.execute();
@@ -53,9 +52,10 @@ public class CommentRepository {
         connection.close();
     }
 
+    @Override
     public Comment save(Comment comment) throws SQLException {
         log.info("Saving comment {}", comment);
-        Connection connection = DatabaseConnection.getInstance().getConnection();
+        Connection connection = dataSource.getConnection();
         PreparedStatement statement = connection.prepareStatement(INSERT);
         statement.setLong(1, comment.getPostId());
         statement.setString(2, comment.getUsersEMail());

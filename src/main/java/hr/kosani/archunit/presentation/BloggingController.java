@@ -2,7 +2,7 @@ package hr.kosani.archunit.presentation;
 
 import hr.kosani.archunit.Controller;
 import hr.kosani.archunit.model.Post;
-import hr.kosani.archunit.persistence.CommentRepository;
+import hr.kosani.archunit.persistence.comment.CommentRepository;
 import hr.kosani.archunit.domain.BloggingService;
 
 import javax.inject.Inject;
@@ -13,10 +13,14 @@ import java.sql.SQLException;
 public class BloggingController {
 
     private final BloggingService service;
+    private final CommentRepository commentRepository;
 
     @Inject
-    public BloggingController(BloggingService service) {
+    public BloggingController(
+            BloggingService service,
+            CommentRepository commentRepository) {
         this.service = service;
+        this.commentRepository = commentRepository;
     }
 
     @GET
@@ -24,8 +28,8 @@ public class BloggingController {
     public Post getPost(@PathParam("id") Long id) {
         try {
             return service.findPostWithCommentsById(id);
-            // TODO handling SQL exceptions in Controller
-        } catch (SQLException e) {
+        } catch (SQLException e) { // TODO Remark 2: persistence-specific exceptions shouldn't leak to presentation layer.
+            // TODO Remark ?: app shouldn't write to standard streams
             e.printStackTrace();
             return null;
         }
@@ -47,9 +51,9 @@ public class BloggingController {
     @Path("/posts/{postId}/comments/{commentId}")
     public void deleteComment(@PathParam("postId") Long postId, @PathParam("commentId") Long commentId) {
         try {
-            // TODO direct access to repositories, services are skipped.
-            CommentRepository.getInstance().deleteById(commentId);
-        } catch (SQLException e) {
+            // TODO Remark 1: direct access to repositories, services are skipped.
+            commentRepository.deleteById(commentId);
+        } catch (SQLException e) { // TODO Remark 2: persistence-specific exceptions shouldn't leak to presentation layer.
             e.printStackTrace();
         }
     }
