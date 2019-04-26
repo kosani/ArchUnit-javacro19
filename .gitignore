@@ -1,0 +1,9 @@
+target/
+target/
+.git
+.idea
+.mvn
+bin
+ArchUnit-javacro19.iml
+
+*.class
