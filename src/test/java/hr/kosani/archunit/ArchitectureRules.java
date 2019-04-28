@@ -4,10 +4,13 @@ import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.lang.ArchCondition;
 import org.junit.Test;
 import org.slf4j.Logger;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.assignableTo;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
+import static com.tngtech.archunit.lang.conditions.ArchConditions.dependOnClassesThat;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 
 public class ArchitectureRules {
@@ -96,5 +99,12 @@ public class ArchitectureRules {
                 .andShould().haveName("LOG")
                 .because("we agreed on this convention")
                 .check(classes);
+    }
+
+    @Test
+    public void preferJavaTimeToJavaDate() {
+        ArchCondition<? super JavaClass> useJavaDate =
+                dependOnClassesThat(assignableTo(java.util.Date.class)).as("use java.util.Date");
+        noClasses().should(useJavaDate).because("modern Java projects use the [java.time] API instead").check(classes);
     }
 }

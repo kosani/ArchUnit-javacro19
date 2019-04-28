@@ -1,14 +1,13 @@
 package hr.kosani.archunit.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class Comment {
     private Long id;
     private Long postId;
     private String usersEMail;
     private String message;
-    // TODO Remark 7: Prefer java.time to Date.
-    private Date postedOn;
+    private LocalDateTime postedOn;
 
     public Long getId() {
         return id;
@@ -34,11 +33,11 @@ public class Comment {
         this.message = message;
     }
 
-    public Date getPostedOn() {
+    public LocalDateTime getPostedOn() {
         return postedOn;
     }
 
-    public void setPostedOn(Date postedOn) {
+    public void setPostedOn(LocalDateTime postedOn) {
         this.postedOn = postedOn;
     }
 

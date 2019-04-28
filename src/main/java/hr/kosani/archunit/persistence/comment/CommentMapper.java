@@ -4,6 +4,7 @@ import hr.kosani.archunit.model.Comment;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ class CommentMapper {
         comment.setId(resultSet.getLong("id"));
         comment.setPostId(resultSet.getLong("post_id"));
         comment.setMessage(resultSet.getString("message"));
-        comment.setPostedOn(resultSet.getDate("posted_on"));
+        comment.setPostedOn(resultSet.getObject("posted_on", LocalDateTime.class));
         comment.setUsersEMail(resultSet.getString("user_email"));
         return comment;
     }
