@@ -1,13 +1,15 @@
 package hr.kosani.archunit.presentation;
 
 import hr.kosani.archunit.Controller;
+import hr.kosani.archunit.domain.BloggingService;
 import hr.kosani.archunit.model.Post;
 import hr.kosani.archunit.persistence.comment.CommentRepository;
-import hr.kosani.archunit.domain.BloggingService;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
-import java.sql.SQLException;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 @Controller
 public class BloggingController {
@@ -26,13 +28,7 @@ public class BloggingController {
     @GET
     @Path("/posts/{id}")
     public Post getPost(@PathParam("id") Long id) {
-        try {
-            return service.findPostWithCommentsById(id);
-        } catch (SQLException e) { // TODO Remark 2: persistence-specific exceptions shouldn't leak to presentation layer.
-            // TODO Remark 7: App shouldn't write to standard streams.
-            e.printStackTrace();
-            return null;
-        }
+        return service.findPostWithCommentsById(id);
     }
 
     @GET
@@ -50,12 +46,7 @@ public class BloggingController {
     @DELETE
     @Path("/posts/{postId}/comments/{commentId}")
     public void deleteComment(@PathParam("postId") Long postId, @PathParam("commentId") Long commentId) {
-        try {
-            // TODO Remark 1: direct access to repositories, services are skipped.
-            commentRepository.deleteById(commentId);
-        } catch (SQLException e) { // TODO Remark 2: persistence-specific exceptions shouldn't leak to presentation layer.
-            // TODO Remark 7: App shouldn't write to standard streams.
-            e.printStackTrace();
-        }
+        // TODO Remark 1: direct access to repositories, services are skipped.
+        commentRepository.deleteById(commentId);
     }
 }

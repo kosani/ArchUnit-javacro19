@@ -7,7 +7,7 @@ public class Comment {
     private Long postId;
     private String usersEMail;
     private String message;
-    // TODO Remark 8: Prefer java.time to Date.
+    // TODO Remark 7: Prefer java.time to Date.
     private Date postedOn;
 
     public Long getId() {

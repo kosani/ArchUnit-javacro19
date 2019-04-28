@@ -54,7 +54,21 @@ public void onlyPersistenceLayerCanAccessJavaSql() {
 }
 ```
 
-* Remark 3: Should depend on interface rather than implementation.
+* Remark 3: Read methods should be called by find.
+```java
+@Test
+public void readMethodsInRepositoriesShouldStartWithFind() {
+    methods().that().areDeclaredInClassesThat().areAnnotatedWith(Repository.class).and().arePublic()
+            .should().haveNameMatching("find.*")
+            .orShould().haveNameMatching("save.*")
+            .orShould().haveNameMatching("delete.*")
+            .as("repository methods names should only be start with find, save or delete*")
+            .check(classes);
+}
+
+```
+
+* Remark 4: Should depend on interface rather than implementation.
 
 ```java
 @Test
@@ -83,20 +97,6 @@ private DescribedPredicate<? super JavaClass> areNotInterfaces() {
 
 ```
 
-* Remark 4: Read methods should be called by find.
-```java
-@Test
-public void readMethodsInRepositoriesShouldStartWithFind() {
-    methods().that().areDeclaredInClassesThat().areAnnotatedWith(Repository.class).and().arePublic()
-            .should().haveNameMatching("find.*")
-            .orShould().haveNameMatching("save.*")
-            .orShould().haveNameMatching("delete.*")
-            .as("repository methods names should only be start with find, save or delete*")
-            .check(classes);
-}
-
-```
-
 * Remark 5: Logger API should be preferred to logger implementation.
 
 ```java
@@ -120,25 +120,7 @@ public void loggersShouldBeConstants() {
             .check(classes);}
 ```
 
-* Remark 7: App shouldn't write to standard streams.
-
-```java
-@Test
-public void noClassesShouldAccessStandardStream() {
-    NO_CLASSES_SHOULD_ACCESS_STANDARD_STREAMS.check(projectClasses);
-}
-```
-
-* Remark 8: Generic exceptions shouldn't be thrown.
-
-```java
-@Test
-public void classesDoNotThrowGenericException() {
-    NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS.check(projectClasses);
-}
-```
-
-* Remark 8: Prefer java.time to Date.
+* Remark 7: Prefer java.time to Date.
 
 ```java
 @Test
@@ -147,30 +129,4 @@ public void preferJavaTimeToJavaDate() {
             dependOnClassesThat(assignableTo(java.util.Date.class)).as("use java.util.Date");
     noClasses().should(useJavaDate).because("modern Java projects use the [java.time] API instead").check(projectClasses);
 }
-```
-
-* Remark 9: Repositories should not have 'I' prefix.
-
-```java
-
-@Test
-public void interfacesShouldNotHavePrefixI() {
-    classes().that().areInterfaces().should(not(havePrefixI))
-            .because("we have more sophisticated IDE-s that tell us when a class is an interface")
-            .check(classes);
-}
-
-
-private ArchCondition<JavaClass> havePrefixI = new ArchCondition<JavaClass>("have prefix I") {
-    @Override
-    public void check(JavaClass item, ConditionEvents events) {
-        String className = item.getSimpleName();
-        boolean satisfied = className.length() > 2 && className.charAt(0) == 'I'
-                && Character.isUpperCase(className.charAt(1));
-        String message = String.format("Interface %s %s prefixed with 'I'",
-                item.getName(),
-                satisfied ? "is" : "is not");
-        events.add(new SimpleConditionEvent(item, satisfied, message));
-    }
-};
 ```

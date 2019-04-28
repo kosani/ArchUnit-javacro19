@@ -3,7 +3,7 @@ package hr.kosani.archunit.domain;
 import hr.kosani.archunit.Service;
 import hr.kosani.archunit.model.Comment;
 import hr.kosani.archunit.model.Post;
-import hr.kosani.archunit.persistence.comment.CommentRepository;
+import hr.kosani.archunit.persistence.comment.CommentRepositoryImpl;
 import hr.kosani.archunit.persistence.post.PostRepository;
 
 import javax.inject.Inject;
@@ -13,11 +13,11 @@ import java.sql.SQLException;
 public class BloggingServiceImpl implements BloggingService {
 
     private final PostRepository postRepository;
-    // TODO Remark 3: Should depend on interface rather than implementation
-    private final CommentRepository commentRepository;
+    // TODO Remark 4: Should depend on interface rather than implementation
+    private final CommentRepositoryImpl commentRepository;
 
     @Inject
-    public BloggingServiceImpl(PostRepository postRepository, CommentRepository commentRepository) {
+    public BloggingServiceImpl(PostRepository postRepository, CommentRepositoryImpl commentRepository) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
     }
@@ -33,9 +33,14 @@ public class BloggingServiceImpl implements BloggingService {
     }
 
     @Override
-    public Post findPostWithCommentsById(Long id) throws SQLException {
+    public Post findPostWithCommentsById(Long id) {
         Post post = postRepository.findById(id);
-        post.setComments(commentRepository.getAllByPostId(id));
+        try {
+            post.setComments(commentRepository.getAllByPostId(id));
+            // TODO Remark 2: Persistence-specific exceptions shouldn't leak to presentation layer.
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return post;
     }
 
@@ -45,12 +50,12 @@ public class BloggingServiceImpl implements BloggingService {
     }
 
     @Override
-    public Long saveComment(Comment comment) throws SQLException {
+    public Long saveComment(Comment comment) {
         return commentRepository.save(comment).getId();
     }
 
     @Override
-    public void deleteComment(Long id) throws SQLException {
+    public void deleteComment(Long id) {
         commentRepository.deleteById(id);
     }
 }
