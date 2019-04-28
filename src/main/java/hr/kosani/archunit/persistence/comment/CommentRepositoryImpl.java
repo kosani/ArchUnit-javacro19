@@ -30,7 +30,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     private DataSource dataSource;
 
     @Override
-    public List<Comment> getAllByPostId(Long postId) {
+    public List<Comment> findAllByPostId(Long postId) {
         log.info("Fetching comments by post id {}", postId);
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_ALL_BY_POST_ID)) {

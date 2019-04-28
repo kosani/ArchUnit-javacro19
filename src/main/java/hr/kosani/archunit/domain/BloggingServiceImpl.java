@@ -34,7 +34,7 @@ public class BloggingServiceImpl implements BloggingService {
     @Override
     public Post findPostWithCommentsById(Long id) {
         Post post = postRepository.findById(id);
-        post.setComments(commentRepository.getAllByPostId(id));
+        post.setComments(commentRepository.findAllByPostId(id));
         return post;
     }
 

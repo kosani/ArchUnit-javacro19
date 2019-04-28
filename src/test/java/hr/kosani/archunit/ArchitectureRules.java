@@ -4,8 +4,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import org.junit.Test;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 
 public class ArchitectureRules {
 
@@ -43,5 +42,15 @@ public class ArchitectureRules {
                 .and().resideOutsideOfPackage("hr.kosani.archunit..persistence..")
                 .should().accessClassesThat().resideInAnyPackage("java.sql..")
                 .check(classesWithSql);
+    }
+
+    @Test
+    public void readMethodsInRepositoriesShouldStartWithFind() {
+        methods().that().areDeclaredInClassesThat().areAnnotatedWith(Repository.class).and().arePublic()
+                .should().haveNameMatching("find.*")
+                .orShould().haveNameMatching("save.*")
+                .orShould().haveNameMatching("delete.*")
+                .as("repository methods names should only be start with find, save or delete*")
+                .check(classes);
     }
 }
