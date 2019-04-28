@@ -80,4 +80,9 @@ public class ArchitectureRules {
             }
         };
     }
+
+    @Test
+    public void classesShouldOnlyUseSlf4jForLogging() {
+        noClasses().should().dependOnClassesThat().resideInAPackage("org.apache.logging..").check(classes);
+    }
 }

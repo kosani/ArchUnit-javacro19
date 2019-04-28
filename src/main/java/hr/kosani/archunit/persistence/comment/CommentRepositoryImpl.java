@@ -3,8 +3,8 @@ package hr.kosani.archunit.persistence.comment;
 import hr.kosani.archunit.Repository;
 import hr.kosani.archunit.model.Comment;
 import hr.kosani.archunit.persistence.DataAccessException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -18,9 +18,8 @@ import java.util.List;
 @Repository
 public class CommentRepositoryImpl implements CommentRepository {
 
-    // TODO Remark 5: Logger API should be preferred to logger implementation.
     // TODO Remark 6: Logger should be final, static and named with upper_case LOG.
-    private static Logger log = LogManager.getLogger(CommentRepositoryImpl.class);
+    private static Logger log = LoggerFactory.getLogger(CommentRepositoryImpl.class);
 
     private static final String SELECT_ALL_BY_POST_ID = "SELECT ID, USER_EMAIL, MESSAGE, POSTED_ON from COMMENT WHERE POST_ID = ?";
     private static final String INSERT = "INSERT INTO COMMENT (POST_ID, USER_EMAIL, MESSAGE, POSTED_ON) VALUES ( ?, ?, ?, ? )";
