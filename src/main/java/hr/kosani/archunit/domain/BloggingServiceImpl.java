@@ -3,7 +3,7 @@ package hr.kosani.archunit.domain;
 import hr.kosani.archunit.Service;
 import hr.kosani.archunit.model.Comment;
 import hr.kosani.archunit.model.Post;
-import hr.kosani.archunit.persistence.comment.CommentRepositoryImpl;
+import hr.kosani.archunit.persistence.comment.CommentRepository;
 import hr.kosani.archunit.persistence.post.PostRepository;
 
 import javax.inject.Inject;
@@ -12,11 +12,10 @@ import javax.inject.Inject;
 public class BloggingServiceImpl implements BloggingService {
 
     private final PostRepository postRepository;
-    // TODO Remark 4: Should depend on interface rather than implementation
-    private final CommentRepositoryImpl commentRepository;
+    private final CommentRepository commentRepository;
 
     @Inject
-    public BloggingServiceImpl(PostRepository postRepository, CommentRepositoryImpl commentRepository) {
+    public BloggingServiceImpl(PostRepository postRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
     }

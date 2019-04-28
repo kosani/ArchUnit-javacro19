@@ -1,9 +1,12 @@
 package hr.kosani.archunit;
 
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import org.junit.Test;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 
 public class ArchitectureRules {
@@ -52,5 +55,29 @@ public class ArchitectureRules {
                 .orShould().haveNameMatching("delete.*")
                 .as("repository methods names should only be start with find, save or delete*")
                 .check(classes);
+    }
+
+    @Test
+    public void layersOnlyCommunicateThroughInterfaces() {
+        noClasses().that().resideInAPackage("..domain..")
+                .should().accessClassesThat(areImplementationsOfLayer("persistence"))
+                .check(classes);
+
+        noClasses().that().resideInAPackage("..presentation..")
+                .should().accessClassesThat(areImplementationsOfLayer("domain"))
+                .check(classes);
+    }
+
+    private DescribedPredicate<JavaClass> areImplementationsOfLayer(String layer) {
+        return resideInAPackage(String.format("..%s..", layer)).and(areNotInterfaces());
+    }
+
+    private DescribedPredicate<? super JavaClass> areNotInterfaces() {
+        return new DescribedPredicate<JavaClass>("are not interfaces") {
+            @Override
+            public boolean apply(JavaClass input) {
+                return !input.isInterface();
+            }
+        };
     }
 }
