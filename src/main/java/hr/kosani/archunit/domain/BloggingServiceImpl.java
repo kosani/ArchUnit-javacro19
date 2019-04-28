@@ -7,7 +7,6 @@ import hr.kosani.archunit.persistence.comment.CommentRepositoryImpl;
 import hr.kosani.archunit.persistence.post.PostRepository;
 
 import javax.inject.Inject;
-import java.sql.SQLException;
 
 @Service
 public class BloggingServiceImpl implements BloggingService {
@@ -35,12 +34,7 @@ public class BloggingServiceImpl implements BloggingService {
     @Override
     public Post findPostWithCommentsById(Long id) {
         Post post = postRepository.findById(id);
-        try {
-            post.setComments(commentRepository.getAllByPostId(id));
-            // TODO Remark 2: Persistence-specific exceptions shouldn't leak to presentation layer.
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        post.setComments(commentRepository.getAllByPostId(id));
         return post;
     }
 

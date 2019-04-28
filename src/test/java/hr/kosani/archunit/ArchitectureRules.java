@@ -34,4 +34,14 @@ public class ArchitectureRules {
                 .should().dependOnClassesThat().resideInAPackage("..presentation..")
                 .check(classes);
     }
+
+    @Test
+    public void onlyPersistenceLayerCanAccessJavaSql() {
+        JavaClasses classesWithSql = new ClassFileImporter().importPackages("hr.kosani.archunit", "java.sql");
+        noClasses()
+                .that().resideInAPackage("hr.kosani.archunit..")
+                .and().resideOutsideOfPackage("hr.kosani.archunit..persistence..")
+                .should().accessClassesThat().resideInAnyPackage("java.sql..")
+                .check(classesWithSql);
+    }
 }

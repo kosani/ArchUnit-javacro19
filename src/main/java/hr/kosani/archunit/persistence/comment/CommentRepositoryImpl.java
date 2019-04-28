@@ -30,7 +30,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     private DataSource dataSource;
 
     @Override
-    public List<Comment> getAllByPostId(Long postId) throws SQLException {
+    public List<Comment> getAllByPostId(Long postId) {
         log.info("Fetching comments by post id {}", postId);
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_ALL_BY_POST_ID)) {
@@ -40,6 +40,8 @@ public class CommentRepositoryImpl implements CommentRepository {
                 return CommentMapper.toComments(resultSet);
             }
 
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
         }
     }
 
