@@ -5,6 +5,7 @@ import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
@@ -84,5 +85,16 @@ public class ArchitectureRules {
     @Test
     public void classesShouldOnlyUseSlf4jForLogging() {
         noClasses().should().dependOnClassesThat().resideInAPackage("org.apache.logging..").check(classes);
+    }
+
+    @Test
+    public void loggersShouldBeConstants() {
+        fields().that().haveRawType(Logger.class)
+                .should().bePrivate()
+                .andShould().beStatic()
+                .andShould().beFinal()
+                .andShould().haveName("LOG")
+                .because("we agreed on this convention")
+                .check(classes);
     }
 }
