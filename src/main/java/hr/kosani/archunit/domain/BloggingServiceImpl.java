@@ -58,4 +58,9 @@ public class BloggingServiceImpl implements BloggingService {
     public void deleteComment(Long id) {
         commentRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteById(Long commentId) {
+        commentRepository.deleteById(commentId);
+    }
 }

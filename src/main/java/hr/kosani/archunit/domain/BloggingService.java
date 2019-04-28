@@ -15,4 +15,6 @@ public interface BloggingService {
     Long saveComment(Comment comment);
 
     void deleteComment(Long id);
+
+    void deleteById(Long commentId);
 }

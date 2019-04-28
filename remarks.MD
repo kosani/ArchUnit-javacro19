@@ -4,21 +4,21 @@
 public void onlyDomainLayerDependsOnPersistenceLayer() {
     classes().that().resideInAPackage("..persistence..")
             .should().onlyHaveDependentClassesThat().resideInAnyPackage("..domain..", "..persistence..")
-            .check(projectClasses);
+            .check(classes);
 }
 
 @Test
 public void onlyPresentationLayerCanDependOnDomainLayer() {
     classes().that().resideInAPackage("..domain..")
             .should().onlyHaveDependentClassesThat().resideInAnyPackage("..domain..", "..presentation..")
-            .check(projectClasses);
+            .check(classes);
 }
 
 @Test
 public void noLayerCanDependOnPresentationLayer() {
     noClasses().that().resideInAnyPackage("..domain..", "..persistence..")
             .should().dependOnClassesThat().resideInAPackage("..presentation..")
-            .check(projectClasses);
+            .check(classes);
 }
 
 ```
@@ -36,7 +36,7 @@ public void noLayerCanDependOnPresentationLayer() {
                 .whereLayer("Presentation").mayNotBeAccessedByAnyLayer()
                 .whereLayer("Domain").mayOnlyBeAccessedByLayers("Presentation", "Domain")
                 .whereLayer("Persistence").mayOnlyBeAccessedByLayers("Domain", "Persistence")
-                .check(projectClasses);
+                .check(classes);
     }
 ```
 
@@ -45,12 +45,12 @@ public void noLayerCanDependOnPresentationLayer() {
 ```java
 @Test
 public void onlyPersistenceLayerCanAccessJavaSql() {
-    JavaClasses projectClassesWithSql = new ClassFileImporter().importPackages("hr.kosani.archunit", "java.sql");
+    JavaClasses classesWithSql = new ClassFileImporter().importPackages("hr.kosani.archunit", "java.sql");
     noClasses()
             .that().resideInAPackage("hr.kosani.archunit..")
             .and().resideOutsideOfPackage("hr.kosani.archunit..persistence..")
             .should().accessClassesThat().resideInAnyPackage("java.sql..")
-            .check(projectClassesWithSql);
+            .check(classesWithSql);
 }
 ```
 
@@ -75,11 +75,11 @@ public void readMethodsInRepositoriesShouldStartWithFind() {
 public void layersOnlyCommunicateThroughInterfaces() {
     noClasses().that().resideInAPackage("..domain..")
             .should().accessClassesThat(areImplementationsOfLayer("persistence"))
-            .check(projectClasses);
+            .check(classes);
 
     noClasses().that().resideInAPackage("..presentation..")
             .should().accessClassesThat(areImplementationsOfLayer("domain"))
-            .check(projectClasses);
+            .check(classes);
 }
 
 private DescribedPredicate<JavaClass> areImplementationsOfLayer(String layer) {
@@ -102,7 +102,7 @@ private DescribedPredicate<? super JavaClass> areNotInterfaces() {
 ```java
 @Test
 public void classesShouldOnlyUseSlf4jForLogging() {
-    noClasses().should().dependOnClassesThat().resideInAPackage("org.apache.logging..").check(projectClasses);
+    noClasses().should().dependOnClassesThat().resideInAPackage("org.apache.logging..").check(classes);
 }
 ```
 
@@ -127,6 +127,6 @@ public void loggersShouldBeConstants() {
 public void preferJavaTimeToJavaDate() {
     ArchCondition<? super JavaClass> useJavaDate =
             dependOnClassesThat(assignableTo(java.util.Date.class)).as("use java.util.Date");
-    noClasses().should(useJavaDate).because("modern Java projects use the [java.time] API instead").check(projectClasses);
+    noClasses().should(useJavaDate).because("modern Java projects use the [java.time] API instead").check(classes);
 }
 ```

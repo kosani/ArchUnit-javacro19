@@ -3,7 +3,6 @@ package hr.kosani.archunit.presentation;
 import hr.kosani.archunit.Controller;
 import hr.kosani.archunit.domain.BloggingService;
 import hr.kosani.archunit.model.Post;
-import hr.kosani.archunit.persistence.comment.CommentRepository;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -15,14 +14,10 @@ import javax.ws.rs.PathParam;
 public class BloggingController {
 
     private final BloggingService service;
-    private final CommentRepository commentRepository;
 
     @Inject
-    public BloggingController(
-            BloggingService service,
-            CommentRepository commentRepository) {
+    public BloggingController(BloggingService service) {
         this.service = service;
-        this.commentRepository = commentRepository;
     }
 
     @GET
@@ -46,7 +41,6 @@ public class BloggingController {
     @DELETE
     @Path("/posts/{postId}/comments/{commentId}")
     public void deleteComment(@PathParam("postId") Long postId, @PathParam("commentId") Long commentId) {
-        // TODO Remark 1: direct access to repositories, services are skipped.
-        commentRepository.deleteById(commentId);
+        service.deleteById(commentId);
     }
 }
